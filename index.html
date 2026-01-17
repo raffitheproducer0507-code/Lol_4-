@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You 🤍</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  background:linear-gradient(120deg,#ff758c,#ff7eb3,#65c7f7,#6a11cb);
+  background-size:300% 300%;
+  animation:bgMove 12s ease infinite;
+}
+@keyframes bgMove{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+.scene{
+  display:none;
+  min-height:100vh;
+  align-items:center;
+  justify-content:center;
+}
+.scene.active{
+  display:flex;
+}
+.glass{
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.25);
+}
+</style>
+</head>
+
+<body class="text-white font-sans overflow-hidden">
+
+<audio id="bgMusic" src="bukti.mp3"></audio>
+
+<!-- SCENE 1 -->
+<div id="scene1" class="scene active">
+<div class="glass p-8 rounded-xl text-center max-w-md">
+<h1 class="text-3xl mb-4">Hai kamu…</h1>
+<p class="text-sm mb-6 opacity-80">boleh pinjam sebentar perasaan kamu?</p>
+<button id="startBtn" class="bg-pink-500 px-6 py-2 rounded-full">
+klik pelan-pelan
+</button>
+</div>
+</div>
+
+<!-- SCENE 2 -->
+<div id="scene2" class="scene">
+<div class="glass p-8 rounded-xl text-center max-w-md">
+
+<p id="line1" class="text-xl opacity-0 mb-3">
+dari semua hal yang datang ke hidup aku…
+</p>
+<p id="line2" class="text-xl opacity-0 mb-3">
+kamu termasuk yang paling aku syukuri.
+</p>
+<p id="line3" class="text-sm opacity-0 italic">
+(ini tentang kamu, <span id="easterTrigger" class="underline cursor-pointer">[NAMA]</span>)
+</p>
+
+<p id="waitText" class="text-xs mt-3 opacity-0 italic">
+tunggu sebentar ya…
+</p>
+
+<div id="choiceBox" class="hidden mt-4 space-x-3">
+<button class="choice bg-white/20 px-4 py-2 rounded" data-choice="senyum">🙂</button>
+<button class="choice bg-white/20 px-4 py-2 rounded" data-choice="terharu">🥹</button>
+</div>
+
+<p id="choiceResult" class="text-sm italic mt-3 opacity-0"></p>
+<div id="secretMessage" class="mt-4 text-pink-200 text-sm hidden"></div>
+
+<button id="nextBtn2" disabled
+class="mt-6 bg-pink-500 px-6 py-2 rounded-full opacity-0">
+lanjut…
+</button>
+</div>
+</div>
+
+<!-- SCENE 3 -->
+<div id="scene3" class="scene">
+<div class="glass p-8 rounded-xl text-center max-w-md">
+<h2 class="text-2xl mb-4">tentang kita</h2>
+
+<p id="mem1" class="opacity-0 mb-2">aku inget momen kecil yang ga kamu sadari</p>
+<p id="mem2" class="opacity-0 mb-2">cara kamu ketawa, diem, bahkan capek</p>
+<p id="mem3" class="opacity-0 mb-4">semuanya pelan-pelan jadi penting</p>
+
+<button id="nextBtn3" class="bg-pink-500 px-6 py-2 rounded-full opacity-0">
+lanjut terakhir
+</button>
+</div>
+</div>
+
+<!-- ENDING A -->
+<div id="endingA" class="scene">
+<div class="glass p-8 rounded-xl text-center max-w-lg">
+<h1 class="text-4xl mb-4">Selamat Ulang Tahun 🤍</h1>
+<p class="text-lg mb-4">
+semoga kamu selalu dikelilingi hal baik  
+dan ga pernah lupa kalau kamu pantas dicintai.
+</p>
+<p class="italic text-sm opacity-80">
+— dari seseorang yang tulus
+</p>
+</div>
+</div>
+
+<!-- ENDING B -->
+<div id="endingB" class="scene">
+<div class="glass p-8 rounded-xl text-center max-w-lg">
+<h1 class="text-4xl mb-4">jujur ya…</h1>
+<p class="text-lg mb-4">
+kalau kamu sampai ke sini,  
+berarti kamu bukan sekadar penonton.
+</p>
+<p class="italic text-sm opacity-80">
+— aku
+</p>
+</div>
+</div>
+
+<script>
+const scenes = document.querySelectorAll(".scene");
+const startBtn = document.getElementById("startBtn");
+const nextBtn2 = document.getElementById("nextBtn2");
+const nextBtn3 = document.getElementById("nextBtn3");
+const bgMusic = document.getElementById("bgMusic");
+const choiceBox = document.getElementById("choiceBox");
+const choiceResult = document.getElementById("choiceResult");
+const waitText = document.getElementById("waitText");
+const easterTrigger = document.getElementById("easterTrigger");
+const secretMessage = document.getElementById("secretMessage");
+
+let endingPath = "A";
+let secretLevel = 0;
+
+bgMusic.volume = 0.6;
+
+function goTo(id){
+  scenes.forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+startBtn.onclick = ()=>{
+  goTo("scene2");
+  bgMusic.play();
+
+  gsap.to("#line1",{opacity:1,delay:.5});
+  gsap.to("#line2",{opacity:1,delay:2});
+  gsap.to("#line3",{opacity:1,delay:3.5});
+  gsap.to("#waitText",{opacity:.7,delay:4});
+
+  setTimeout(()=>{
+    nextBtn2.disabled=false;
+    waitText.innerText="sekarang boleh lanjut 🤍";
+    gsap.to(nextBtn2,{opacity:1});
+  },6000);
+
+  setTimeout(()=>choiceBox.classList.remove("hidden"),4500);
+};
+
+document.querySelectorAll(".choice").forEach(btn=>{
+  btn.onclick=()=>{
+    choiceResult.innerText =
+      btn.dataset.choice==="terharu"
+      ?"makasih udah ngerasain ini bareng aku"
+      :"aku bisa ngerasa senyum kamu";
+    gsap.to(choiceResult,{opacity:1});
+    choiceBox.remove();
+    if(btn.dataset.choice==="terharu") endingPath="B";
+  };
+});
+
+easterTrigger.onclick=()=>{
+  secretMessage.classList.remove("hidden");
+  secretLevel++;
+  if(secretLevel===1) secretMessage.innerText="aku jarang bilang ini 🤍";
+  else if(secretLevel===2) secretMessage.innerText="tapi kamu sering ada di kepala aku";
+  else{
+    secretMessage.innerText="kalau kamu sampai sini… kamu spesial";
+    confetti({particleCount:40,spread:60});
+    endingPath="B";
+  }
+};
+
+nextBtn2.onclick=()=>{
+  goTo("scene3");
+  gsap.to("#mem1",{opacity:1,delay:.5});
+  gsap.to("#mem2",{opacity:1,delay:1.5});
+  gsap.to("#mem3",{opacity:1,delay:2.5});
+  gsap.to(nextBtn3,{opacity:1,delay:4});
+};
+
+nextBtn3.onclick=()=>{
+  goTo(endingPath==="B"?"endingB":"endingA");
+  confetti({particleCount:120,spread:80});
+};
+</script>
+
+</body>
+</html>
